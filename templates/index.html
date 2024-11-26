@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+{% block title %}
+    products
+{% endblock %}
+{% block _category %}
+    <div class="dropdown">
+        <button class="btn btn-secondary text-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false" style="background-color: white; border: none">
+            Category
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {% for cat in category %}
+                <a class="dropdown-item" href="">{{ cat.category_name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <h2 class="mb-4">Active Listings</h2>
+    <div class="row w100 h100">
+        {% for product in products %}
+
+            <div class="col-3 d-flex align-item-center justify-content-center">
+                <div class="card">
+                    <img src="{{ product.image_url }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.product_name }}</h5>
+                        <p class="card-text">
+                            {{ product.description }}
+                        </p>
+                        <div>
+                            <small class="{% if product.status == 'end' %}text-danger{% else %}text-muted{% endif %}">
+                                {% if product.status == 'end' %}
+                                    ending bid --> {{ product.starting_bid }}$
+                                {% else %}
+                                    starting bid --> {{ product.starting_bid }}$
+                                {% endif %}
+                            </small>
+                        </div>
+                        <a href="{{ product.get_absolute_url }}"
+                           class="d-flex justify-content-end text-decoration-none">
+                            <button class="btn btn-outline-primary btn-sm">See Detail</button>
+                        </a>
+                    </div>
+
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated --> {{ product.date_modified }}</small>
+                    </div>
+                </div>
+            </div>
+
+
+        {% endfor %}
+    </div>
+
+{% endblock %}

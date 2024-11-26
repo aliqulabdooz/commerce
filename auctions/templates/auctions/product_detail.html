@@ -1,0 +1,121 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    {{ product.product_name }}
+{% endblock %}
+{% block body %}
+    <div class="d-flex justify-content-center mt-5">
+        <div class="card mb-3 w-75 text-center shadow ">
+            <img src="{{ product.image_url }}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.product_name }}</h5>
+                <p class="card-text">
+                    {{ product.description }}
+                </p>
+                <div>
+                    <small class="text-muted">
+                        {% if product.status == 'end' %}
+                            ending bid --> {{ product.starting_bid }}$
+                        {% else %}
+                            starting bid --> {{ product.starting_bid }}$
+                        {% endif %}
+                    </small>
+                </div>
+                {% if user.is_authenticated %}
+                    {% if check %}
+                        {% if product.status == 'start' %}
+                            <a href="{% url 'auctions:end_product_bid' product.id %}"
+                               class="text-decoration-none btn btn-outline-danger rounded m-3">ending bid</a>
+                        {% else %}
+                            <a href="{% url 'auctions:start_product_bid' product.id %}"
+                               class="text-decoration-none btn btn-outline-success rounded m-3">starting bid</a>
+                        {% endif %}
+                    {% elif product.status == 'end' %}
+                        {% if winner and winner.author_id == request.user.id %}
+                            <p class="text-success m-2"><strong>You, the {{ winner.author.username }}, won the bid.
+                                😁😁</strong>
+                            </p>
+                            <p class="text-muted">The product was purchased for {{ product.starting_bid }}$</p>
+                        {% else %}
+                            <div class="m-3">
+                                <p class="text-danger m-2"><strong>The product tender has ended.</strong></p>
+                                <p class="text-muted">The product was purchased for {{ product.starting_bid }}$</p>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <form class="d-flex flex-column align-items-center justify-content-center m-3" action=""
+                              method="post">
+                            {% csrf_token %}
+                            {{ bid_form|crispy }}
+                            <input type="submit" class="btn btn-outline-success rounded">
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-danger m-3">You must be logged in to set an auction price --> <a
+                            href="{% url 'accounts:login' %}">Login</a></p>
+                {% endif %}
+
+                <p class="card-text"><small class="text-muted">Last updated --> {{ product.date_modified }}</small></p>
+                {% if user.is_authenticated %}
+                    {% if check_watch %}
+                        <a href="{% url 'auctions:remove_product_watchlist' product.id %}"
+                           class="text-decoration-none btn btn-outline-danger rounded m-3">Remove to watchlist</a>
+                    {% else %}
+                        <a href="{% url 'auctions:add_product_watchlist' product.id %}"
+                           class="text-decoration-none btn btn-outline-primary rounded m-3">Add to watchlist</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center mt-3">
+        <div class="card mb-3 w-75 text-center shadow p-4">
+            <h2 class="mb-3 text-secondary">Add Comment</h2>
+            <form class="container-fluid w-50" action="{% url 'auctions:add_comment' product.id %}" method="post">
+                {% csrf_token %}
+                {{ comment_form|crispy }}
+                <input type="submit" class="btn btn-outline-primary w-100">
+            </form>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center mt-3">
+        <div class="card mb-3 w-75 shadow p-4">
+            {% if comments %}
+                <h4 class="text-secondary text-center mb-4">Comments:</h4>
+                {% for comment in comments %}
+                    <div class="d-flex flex-column align-items-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"
+                             class="object-fit-scale shadow rounded-circle mb-2" alt="..." style="width: 100px">
+                        <p>
+                            {{ comment.author.username }}
+                        </p>
+                        <p class="mb-2">
+                            <small class="text-primary">{{ comment.caption }}</small>
+                        </p>
+                        <p>
+                            <small class="text-muted">created --> {{ comment.date_created }}</small>
+                        </p>
+                    </div>
+                    <hr>
+                {% endfor %}
+            {% else %}
+                {% for comment in comments %}
+                    <div class="d-flex flex-column">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"
+                             class="rounded-start object-fit-scale shadow rounded mb-2" alt="..." style="width: 100px">
+                        <p>
+                            no username
+                        </p>
+                        <p class="mb-2">
+                            <small class="text-primary">no caption</small>
+                        </p>
+                        <p>
+                            <small class="text-muted">created --> no date_created</small>
+                        </p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock %}

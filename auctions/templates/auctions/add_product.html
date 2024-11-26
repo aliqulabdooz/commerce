@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    add_post
+{% endblock %}
+{% block body %}
+    <div class="container w-100">
+        <div class="card container-fluid w-75 d-flex justify-content-center align-items-center shadow rounded p-4">
+            <h2 class="mb-4">Add Product</h2>
+            <form action="" class="w-50" method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input type="submit" class="btn btn-primary w-100 mb-2">
+            </form>
+        </div>
+    </div>
+{% endblock %}
